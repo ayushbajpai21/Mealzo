@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Search, Filter, RefreshCw } from 'lucide-react';
-import { adminAPI, API_BASE_URL } from '../../services/api';
+import { adminAPI } from '../../services/api';
 
 const ManageOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -21,19 +21,15 @@ const ManageOrders = () => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/orders`, {
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setOrders(data.data || []);
-            } else if (response.status === 401) {
-                sessionStorage.removeItem('adminAuth');
-                window.location.href = '/login';
-            }
+            const response = await adminAPI.getOrders();
+            setOrders(response.data.data || []);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            if (error.response?.status === 401) {
+                sessionStorage.removeItem('adminAuth');
+                sessionStorage.removeItem('adminToken');
+                window.location.href = '/login';
+            }
         } finally {
             setLoading(false);
         }
@@ -59,16 +55,8 @@ const ManageOrders = () => {
 
     const handleStatusUpdate = async (orderId, newStatus) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (response.ok) {
+            const response = await adminAPI.updateOrderStatus(orderId, newStatus);
+            if (response.data.success) {
                 // Refresh orders
                 fetchOrders();
             }

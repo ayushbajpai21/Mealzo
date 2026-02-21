@@ -65,6 +65,9 @@ const Login = () => {
                 const data = await response.json();
                 if (data.success) {
                     sessionStorage.setItem('adminAuth', 'true');
+                    if (data.token) {
+                        sessionStorage.setItem('adminToken', data.token);
+                    }
                     navigate('/');
                 } else {
                     setError(data.message || 'Admin login failed');

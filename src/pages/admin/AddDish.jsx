@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Upload, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
-import { API_BASE_URL } from '../../services/api';
+import { adminAPI } from '../../services/api';
 
 const AddDish = () => {
     const [formData, setFormData] = useState({
@@ -49,13 +49,9 @@ const AddDish = () => {
             formDataToSend.append('description', formData.description);
             formDataToSend.append('image', image);
 
-            const response = await fetch(`${API_BASE_URL}/admin/add-dish`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formDataToSend
-            });
+            const response = await adminAPI.addDish(formDataToSend);
 
-            if (response.ok) {
+            if (response.data.success) {
                 setMessage({ type: 'success', text: 'Dish added successfully!' });
                 // Reset form
                 setFormData({
@@ -68,14 +64,16 @@ const AddDish = () => {
                 setImage(null);
                 setImagePreview(null);
             } else {
-                const errorData = await response.json();
                 setMessage({
                     type: 'error',
-                    text: errorData.message || 'Failed to add dish. Please try again.'
+                    text: response.data.message || 'Failed to add dish. Please try again.'
                 });
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to connect to server.' });
+            setMessage({
+                type: 'error',
+                text: error.response?.data?.message || 'Failed to connect to server.'
+            });
         } finally {
             setLoading(false);
         }

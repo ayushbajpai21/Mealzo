@@ -26,7 +26,11 @@ const AdminLogin = () => {
             });
 
             if (response.ok) {
+                const data = await response.json();
                 sessionStorage.setItem('adminAuth', 'true');
+                if (data.token) {
+                    sessionStorage.setItem('adminToken', data.token);
+                }
                 navigate('/');
             } else {
                 setError('Invalid credentials');

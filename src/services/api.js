@@ -11,10 +11,15 @@ const api = axios.create({
     withCredentials: true
 });
 
-// Add auth auth token to requests
+// Add auth token to requests
 api.interceptors.request.use((config) => {
     const userToken = sessionStorage.getItem('userToken');
-    if (userToken) {
+    const adminToken = sessionStorage.getItem('adminToken');
+
+    // Prioritize adminToken for admin routes, otherwise use userToken
+    if (adminToken) {
+        config.headers.Authorization = `Bearer ${adminToken}`;
+    } else if (userToken) {
         config.headers.Authorization = `Bearer ${userToken}`;
     }
     return config;
@@ -41,19 +46,17 @@ export const authAPI = {
     getMe: () => api.get('/api/auth/me'),
 };
 
-// Admin APIs (using session-based auth)
+// Admin APIs (now using JWT tokens via interceptor)
 export const adminAPI = {
-    login: (credentials) => axios.post(`${API_BASE_URL}/admin/login`, credentials, { withCredentials: true }),
-    getDashboard: () => axios.get(`${API_BASE_URL}/admin/dashboard`, { withCredentials: true }),
-    addDish: (formData) => axios.post(`${API_BASE_URL}/admin/add-dish`, formData, {
-        withCredentials: true,
+    login: (credentials) => api.post('/admin/login', credentials),
+    getDashboard: () => api.get('/admin/dashboard'),
+    addDish: (formData) => api.post('/admin/add-dish', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
-    getOrders: () => axios.get(`${API_BASE_URL}/admin/orders`, { withCredentials: true }),
-    updateOrderStatus: (orderId, status) => axios.post(
-        `${API_BASE_URL}/admin/orders/${orderId}/status`,
-        { status },
-        { withCredentials: true }
+    getOrders: () => api.get('/admin/orders'),
+    updateOrderStatus: (orderId, status) => api.post(
+        `/admin/orders/${orderId}/status`,
+        { status }
     ),
 };
 
