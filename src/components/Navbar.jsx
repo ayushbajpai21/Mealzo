@@ -152,9 +152,21 @@ const Navbar = () => {
                     </div>
 
                     {/* Mobile Menu Toggle */}
-                    <button className="md:hidden p-2 text-gray-600" onClick={() => setIsOpen(!isOpen)}>
-                        {isOpen ? <X size={24} /> : <MenuIcon size={24} />}
-                    </button>
+                    <div className="flex items-center gap-2 md:hidden">
+                        {!isAdmin && (
+                            <Link to="/cart" className="relative group p-2">
+                                <ShoppingCart size={22} className="text-gray-600" />
+                                {cartCount > 0 && (
+                                    <span className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
+                        <button className="p-2 text-gray-600" onClick={() => setIsOpen(!isOpen)}>
+                            {isOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
