@@ -1,13 +1,52 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Utensils, ShieldCheck, Zap, Star } from 'lucide-react';
+import { ArrowRight, Play, Utensils, ShieldCheck, Zap, Star, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { dishes, reviews } from '../data/mockData';
+import { reviews } from '../data/mockData';
 import DishCard from '../components/DishCard';
 import CategoryFilter from '../components/CategoryFilter';
+import { categoryAPI, dishAPI } from '../services/api';
+import { useEffect } from 'react';
 
 const Home = () => {
-    const [activeCategory, setActiveCategory] = useState('main-course');
+    const [activeCategory, setActiveCategory] = useState('');
+    const [dishes, setDishes] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                const [categoriesRes, dishesRes] = await Promise.all([
+                    categoryAPI.getAll(),
+                    dishAPI.getAll()
+                ]);
+
+                if (categoriesRes.data.success) {
+                    setCategories(categoriesRes.data.data);
+                    if (categoriesRes.data.data.length > 0) {
+                        setActiveCategory(categoriesRes.data.data[0].slug);
+                    }
+                }
+
+                if (dishesRes.data.success) {
+                    const mappedDishes = dishesRes.data.data.map(dish => ({
+                        ...dish,
+                        id: dish._id,
+                        isVeg: dish.type === 'Veg',
+                        category: dish.category.toLowerCase().replace(/\s+/g, '-')
+                    }));
+                    setDishes(mappedDishes);
+                }
+            } catch (error) {
+                console.error("Error fetching homepage data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -46,7 +85,7 @@ const Home = () => {
                                 to Your Table.
                             </h1>
                             <p className="text-gray-500 text-lg lg:text-xl mb-10 max-w-lg leading-relaxed">
-                                Experience the soul of home-cooked meals. Sakshi Kitchen Flavour brings you hygienic, healthy, and delicious homestyle food in Lucknow.
+                                Experience the soul of home-cooked meals. Mealzo brings you hygienic, healthy, and delicious homestyle food in Lucknow.
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <Link to="/menu" className="btn-primary px-8 py-4 shadow-xl shadow-primary-100">
@@ -133,23 +172,27 @@ const Home = () => {
                             </h2>
                             <p className="text-gray-500">Explore our most loved recipes curated just for you.</p>
                         </div>
-                        <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+                        <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} categories={categories} />
                     </div>
 
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-                    >
-                        {dishes
-                            .filter(dish => dish.category === activeCategory)
-                            .map(dish => (
-                                <DishCard key={dish.id} dish={dish} />
-                            ))
-                        }
-                    </motion.div>
+                    {loading ? (
+                        <div className="text-center text-gray-500">Loading dishes...</div>
+                    ) : (
+                        <motion.div
+                            variants={containerVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+                        >
+                            {dishes
+                                .filter(dish => dish.category === activeCategory)
+                                .map(dish => (
+                                    <DishCard key={dish.id} dish={dish} />
+                                ))
+                            }
+                        </motion.div>
+                    )}
 
                     <div className="mt-16 text-center">
                         <Link to="/menu" className="btn-outline inline-flex">

@@ -32,6 +32,10 @@ export const dishAPI = {
     getById: (id) => api.get(`/api/dishes/${id}`),
 };
 
+export const categoryAPI = {
+    getAll: () => api.get('/api/categories'),
+};
+
 // Order APIs
 export const orderAPI = {
     create: (data) => api.post('/api/orders', data),

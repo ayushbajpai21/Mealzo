@@ -1,66 +1,55 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, ChevronDown, UtensilsCrossed } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, UtensilsCrossed, Loader2 } from 'lucide-react';
 import DishCard from '../components/DishCard';
-import { dishAPI } from '../services/api';
+import { dishAPI, categoryAPI } from '../services/api';
 
 const Menu = () => {
     const [dishes, setDishes] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('name');
     const [isSortOpen, setIsSortOpen] = useState(false);
 
-    // Fetch dishes from backend
+    // Fetch dishes and categories from backend
     useEffect(() => {
-        fetchDishes();
-    }, []);
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [categoriesRes, dishesRes] = await Promise.all([
+                    categoryAPI.getAll(),
+                    dishAPI.getAll()
+                ]);
 
-    const fetchDishes = async () => {
-        try {
-            setLoading(true);
-            const response = await dishAPI.getAll();
-            const dishesData = response.data.data.map(dish => ({
-                id: dish._id,
-                name: dish.name,
-                description: dish.description,
-                price: dish.price,
-                image: dish.image,
-                category: dish.category.toLowerCase().replace(' ', '-'),
-                type: dish.type,
-                isVeg: dish.type === 'Veg',
-                available: dish.available
-            }));
-            setDishes(dishesData);
-        } catch (error) {
-            console.error('Error fetching dishes:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+                if (categoriesRes.data.success) {
+                    setCategories(categoriesRes.data.data);
+                }
 
-    const getCategoryIcon = (category) => {
-        const icons = {
-            'starter': '🥗',
-            'main-course': '🍛',
-            'rice': '🍚',
-            'bread': '🍞',
-            'dessert': '🍰'
+                if (dishesRes.data.success) {
+                    const dishesData = dishesRes.data.data.map(dish => ({
+                        id: dish._id,
+                        name: dish.name,
+                        description: dish.description,
+                        price: dish.price,
+                        image: dish.image,
+                        category: dish.category.toLowerCase().replace(/\s+/g, '-'),
+                        type: dish.type,
+                        isVeg: dish.type === 'Veg',
+                        available: dish.available
+                    }));
+                    setDishes(dishesData);
+                }
+            } catch (error) {
+                console.error('Error fetching menu data:', error);
+            } finally {
+                setLoading(false);
+            }
         };
-        return icons[category] || '🍽️';
-    };
 
-    // Extract unique categories from dishes
-    const categories = useMemo(() => {
-        const uniqueCategories = [...new Set(dishes.map(d => d.category))];
-        return uniqueCategories.map(cat => ({
-            id: cat,
-            slug: cat,
-            name: cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-            icon: getCategoryIcon(cat)
-        }));
-    }, [dishes]);
+        fetchData();
+    }, []);
 
     const filteredDishes = useMemo(() => {
         let result = [...dishes];
@@ -97,12 +86,8 @@ const Menu = () => {
 
     if (loading) {
         return (
-            <div className="pt-32 pb-20">
-                <div className="container-custom">
-                    <div className="flex items-center justify-center h-64">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-500"></div>
-                    </div>
-                </div>
+            <div className="pt-32 pb-20 min-h-screen flex items-center justify-center">
+                <Loader2 className="animate-spin text-primary-500" size={48} />
             </div>
         );
     }
@@ -132,29 +117,33 @@ const Menu = () => {
                 {/* Filters & Search */}
                 <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-center justify-between mb-12">
                     {/* Categories */}
-                    <div className="flex gap-3 overflow-x-auto pb-2 w-full lg:w-auto no-scrollbar mask-fade-right">
-                        <button
-                            onClick={() => setActiveCategory('all')}
-                            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all shrink-0 whitespace-nowrap ${activeCategory === 'all'
-                                ? 'bg-primary-500 text-white shadow-xl shadow-primary-200 ring-4 ring-primary-500/10'
-                                : 'bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 hover:border-gray-200'
-                                }`}
-                        >
-                            All Dishes
-                        </button>
-                        {categories.map(cat => (
+                    <div className="relative flex-grow lg:flex-grow-0 overflow-hidden">
+                        <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
                             <button
-                                key={cat.id}
-                                onClick={() => setActiveCategory(cat.slug)}
-                                className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all shrink-0 flex items-center gap-2 whitespace-nowrap ${activeCategory === cat.slug
+                                onClick={() => setActiveCategory('all')}
+                                className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all shrink-0 whitespace-nowrap ${activeCategory === 'all'
                                     ? 'bg-primary-500 text-white shadow-xl shadow-primary-200 ring-4 ring-primary-500/10'
                                     : 'bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 hover:border-gray-200'
                                     }`}
                             >
-                                <span className="text-base leading-none">{cat.icon}</span>
-                                {cat.name}
+                                All Dishes
                             </button>
-                        ))}
+                            {categories.map(cat => (
+                                <button
+                                    key={cat._id}
+                                    onClick={() => setActiveCategory(cat.slug)}
+                                    className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all shrink-0 flex items-center gap-2 whitespace-nowrap ${activeCategory === cat.slug
+                                        ? 'bg-primary-500 text-white shadow-xl shadow-primary-200 ring-4 ring-primary-500/10'
+                                        : 'bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 hover:border-gray-200'
+                                        }`}
+                                >
+                                    <span className="text-base leading-none">{cat.icon}</span>
+                                    {cat.name}
+                                </button>
+                            ))}
+                        </div>
+                        {/* Gradient mask for better UX indicating more scrollable items */}
+                        <div className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none hidden sm:block"></div>
                     </div>
 
                     <div className="flex gap-4 w-full lg:w-auto items-stretch h-12 lg:h-13">
@@ -174,7 +163,7 @@ const Menu = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsSortOpen(!isSortOpen)}
-                                className="h-full px-5 bg-white border border-gray-200 rounded-2xl flex items-center gap-3 text-sm font-bold text-dark hover:border-primary-500 hover:shadow-xl hover:shadow-primary-500/5 transition-all active:scale-95"
+                                className="h-full px-5 bg-white border border-gray-200 rounded-2xl flex items-center gap-3 text-sm font-bold text-dark hover:border-primary-500 hover:shadow-xl shadow-primary-500/5 transition-all active:scale-95"
                             >
                                 <SlidersHorizontal size={18} className="text-primary-500" />
                                 <span className="hidden sm:inline text-gray-400 font-medium">Sort by:</span>
@@ -230,7 +219,7 @@ const Menu = () => {
                     >
                         <AnimatePresence mode="popLayout">
                             {filteredDishes.map((dish) => (
-                                <DishCard key={dish.id} dish={dish} />
+                                <DishCard key={dish._id || dish.id} dish={dish} />
                             ))}
                         </AnimatePresence>
                     </motion.div>
