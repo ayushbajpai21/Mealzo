@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Upload, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 const AddDish = () => {
     const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ const AddDish = () => {
             formDataToSend.append('description', formData.description);
             formDataToSend.append('image', image);
 
-            const response = await fetch('http://localhost:5000/admin/add-dish', {
+            const response = await fetch(`${API_BASE_URL}/admin/add-dish`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formDataToSend

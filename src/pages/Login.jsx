@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../services/api';
 
 const Login = () => {
     const [activeTab, setActiveTab] = useState('login');
@@ -51,7 +52,7 @@ const Login = () => {
         try {
             if (isAdmin) {
                 // Admin login via admin API
-                const response = await fetch('http://localhost:5000/admin/login', {
+                const response = await fetch(`${API_BASE_URL}/admin/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',

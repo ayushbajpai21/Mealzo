@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 const AdminLogin = () => {
     const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ const AdminLogin = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/admin/login', {
+            const response = await fetch(`${API_BASE_URL}/admin/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

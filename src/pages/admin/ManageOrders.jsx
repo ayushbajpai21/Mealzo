@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Search, Filter, RefreshCw } from 'lucide-react';
-import { adminAPI } from '../../services/api';
+import { adminAPI, API_BASE_URL } from '../../services/api';
 
 const ManageOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -21,7 +21,7 @@ const ManageOrders = () => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/admin/orders', {
+            const response = await fetch(`${API_BASE_URL}/admin/orders`, {
                 credentials: 'include'
             });
 
@@ -59,7 +59,7 @@ const ManageOrders = () => {
 
     const handleStatusUpdate = async (orderId, newStatus) => {
         try {
-            const response = await fetch(`http://localhost:5000/admin/orders/${orderId}/status`, {
+            const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
