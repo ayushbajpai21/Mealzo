@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const CategoryFilter = ({ categories, activeCategory, setActiveCategory }) => {
+const CategoryFilter = ({ categories, activeCategory, setActiveCategory, showAll }) => {
     return (
         <div className="relative overflow-hidden w-full">
             <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
