@@ -246,9 +246,19 @@ const AddDish = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-primary-200 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                         >
-                            {loading ? 'Adding Dish...' : 'Add Dish to Menu'}
+                            {loading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <span>Adding Dish...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload size={20} className="group-hover:-translate-y-1 transition-transform" />
+                                    <span>Add Dish to Menu</span>
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>

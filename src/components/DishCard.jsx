@@ -49,15 +49,13 @@ const DishCard = ({ dish }) => {
                 </div>
                 <button
                     onClick={() => addToCart(dish)}
-                    className="w-10 h-10 bg-primary-500 text-white rounded-xl flex items-center justify-center hover:bg-primary-600 shadow-md transform transition-transform active:scale-95 overflow-hidden relative group/btn"
+                    className="group/btn relative px-4 py-2 bg-primary-500 text-white rounded-xl flex items-center gap-2 hover:bg-primary-600 shadow-md hover:shadow-xl hover:shadow-primary-100 transition-all duration-300 active:scale-95 overflow-hidden"
                 >
-                    <motion.div
-                        whileHover={{ y: -40 }}
-                        className="flex flex-col items-center gap-8 transition-transform duration-300"
-                    >
-                        <ShoppingCart size={18} />
-                        <span className="text-xs font-bold uppercase transition-opacity duration-300">Add</span>
-                    </motion.div>
+                    <ShoppingCart size={18} className="relative z-10" />
+                    <span className="text-sm font-bold relative z-10">Add</span>
+
+                    {/* Glossy Overlay effect on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform duration-1000"></div>
                 </button>
             </div>
         </motion.div>
