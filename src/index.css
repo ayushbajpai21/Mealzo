@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+
+  --color-secondary-50: #f0fdf4;
+  --color-secondary-500: #22c55e;
+
+  --color-dark: #1a1a1a;
+
+  --font-outfit: "Outfit", sans-serif;
+  --font-inter: "Inter", sans-serif;
+
+  --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+  --shadow-premium-hover: 0 20px 50px -12px rgba(0, 0, 0, 0.1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  --animate-fade-in: fade-in 0.5s ease-out forwards;
+  --animate-slide-up: slide-up 0.5s ease-out forwards;
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+@layer base {
+  body {
+    @apply font-inter bg-white text-dark antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-outfit;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:bg-primary-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-500 px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:bg-primary-50 hover:shadow-md active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-4 shadow-premium transition-all duration-500 hover:shadow-premium-hover;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-200 rounded-full hover:bg-primary-300 transition-colors;
+}
