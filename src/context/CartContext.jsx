@@ -15,7 +15,7 @@ export const CartProvider = ({ children }) => {
 
     // Load cart from localStorage on mount
     useEffect(() => {
-        const savedCart = localStorage.getItem('sakshi_kitchen_cart');
+        const savedCart = localStorage.getItem('mealzo_cart');
         if (savedCart) {
             try {
                 setCartItems(JSON.parse(savedCart));
@@ -27,7 +27,7 @@ export const CartProvider = ({ children }) => {
 
     // Save cart to localStorage on change
     useEffect(() => {
-        localStorage.setItem('sakshi_kitchen_cart', JSON.stringify(cartItems));
+        localStorage.setItem('mealzo_cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
     const addToCart = (dish) => {
