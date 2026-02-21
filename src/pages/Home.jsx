@@ -9,7 +9,7 @@ import { categoryAPI, dishAPI } from '../services/api';
 import { useEffect } from 'react';
 
 const Home = () => {
-    const [activeCategory, setActiveCategory] = useState('');
+    const [activeCategory, setActiveCategory] = useState('all');
     const [dishes, setDishes] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -172,7 +172,12 @@ const Home = () => {
                             </h2>
                             <p className="text-gray-500">Explore our most loved recipes curated just for you.</p>
                         </div>
-                        <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} categories={categories} />
+                        <CategoryFilter
+                            activeCategory={activeCategory}
+                            setActiveCategory={setActiveCategory}
+                            categories={categories}
+                            showAll={true}
+                        />
                     </div>
 
                     {loading ? (
@@ -186,7 +191,8 @@ const Home = () => {
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
                         >
                             {dishes
-                                .filter(dish => dish.category === activeCategory)
+                                .filter(dish => activeCategory === 'all' || dish.category === activeCategory)
+                                .slice(0, 8) // Limit to 8 for the home page featured section
                                 .map(dish => (
                                     <DishCard key={dish.id} dish={dish} />
                                 ))

@@ -128,7 +128,7 @@ const Menu = () => {
                             >
                                 All Dishes
                             </button>
-                            {categories.map(cat => (
+                            {categories.filter(cat => dishes.some(dish => dish.category === cat.slug)).map(cat => (
                                 <button
                                     key={cat._id}
                                     onClick={() => setActiveCategory(cat.slug)}
