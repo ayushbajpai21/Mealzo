@@ -37,6 +37,21 @@ const Home = () => {
                         category: dish.category.toLowerCase().replace(/\s+/g, '-')
                     }));
                     setDishes(mappedDishes);
+
+                    // Combine fixed categories with any unique ones from dishes
+                    const dishCategories = [...new Set(mappedDishes.map(d => d.category))];
+                    const existingSlugs = categoriesRes.data.data.map(c => c.slug);
+
+                    const extraCategories = dishCategories
+                        .filter(slug => !existingSlugs.includes(slug))
+                        .map(slug => ({
+                            _id: slug,
+                            name: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+                            slug: slug,
+                            icon: '🍽️'
+                        }));
+
+                    setCategories([...categoriesRes.data.data, ...extraCategories]);
                 }
             } catch (error) {
                 console.error("Error fetching homepage data:", error);

@@ -29,17 +29,34 @@ const Menu = () => {
 
                 if (dishesRes.data.success) {
                     const dishesData = dishesRes.data.data.map(dish => ({
+                        ...dish,
                         id: dish._id,
                         name: dish.name,
                         description: dish.description,
                         price: dish.price,
                         image: dish.image,
                         category: dish.category.toLowerCase().replace(/\s+/g, '-'),
+                        categoryName: dish.category, // Keep original name for display
                         type: dish.type,
                         isVeg: dish.type === 'Veg',
                         available: dish.available
                     }));
                     setDishes(dishesData);
+
+                    // Combine fixed categories with any "orphaned" ones from dishes
+                    const dishCategories = [...new Set(dishesData.map(d => d.category))];
+                    const existingSlugs = categoriesRes.data.data.map(c => c.slug);
+
+                    const extraCategories = dishCategories
+                        .filter(slug => !existingSlugs.includes(slug))
+                        .map(slug => ({
+                            _id: slug,
+                            name: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+                            slug: slug,
+                            icon: '🍽️' // Default icon
+                        }));
+
+                    setCategories([...categoriesRes.data.data, ...extraCategories]);
                 }
             } catch (error) {
                 console.error('Error fetching menu data:', error);
@@ -128,7 +145,7 @@ const Menu = () => {
                             >
                                 All Dishes
                             </button>
-                            {categories.filter(cat => dishes.some(dish => dish.category === cat.slug)).map(cat => (
+                            {categories.map(cat => (
                                 <button
                                     key={cat._id}
                                     onClick={() => setActiveCategory(cat.slug)}
