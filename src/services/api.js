@@ -16,10 +16,11 @@ api.interceptors.request.use((config) => {
     const userToken = sessionStorage.getItem('userToken');
     const adminToken = sessionStorage.getItem('adminToken');
 
-    // Prioritize adminToken for admin routes, otherwise use userToken
-    if (adminToken) {
+    // Use adminToken only for admin routes
+    if (config.url.startsWith('/admin') && adminToken) {
         config.headers.Authorization = `Bearer ${adminToken}`;
     } else if (userToken) {
+        // Use userToken for all other routes (specifically /api/)
         config.headers.Authorization = `Bearer ${userToken}`;
     }
     return config;
